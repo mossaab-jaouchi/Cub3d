@@ -1,65 +1,83 @@
-#include <mlx.h>
-#include <stdlib.h>
-#include <stdio.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: achamdao <achamdao@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/12 18:00:39 by achamdao          #+#    #+#             */
+/*   Updated: 2025/07/26 09:41:02 by achamdao         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
+#include "cub.h"
 
-#define WIDTH 1000
-#define HEIGHT 800
-
-#define SKY_COLOR 0x87CEEB   // Light Blue Sky
-#define FLOOR_COLOR 0x8B4513 // Brown Earth
-
-typedef struct s_vars{
-	void *mlx;
-	void *win;
-	void *img;
-	char *data;
-	int bpp;
-	int line_len;
-	int endian;
-}	t_vars;
-
-
-int	close(int keycode, t_vars *vars)
+void f()
 {
-	vars = NULL;
-	if (keycode == 53) // ESC
-		exit(0);
-	return (0);
+    system("leaks cube");
+}
+void print_matrix(char **matrix)
+{
+    int i = 0;
+    while (matrix[i])
+    {
+        printf("%s", matrix[i]);
+        i++;
+    }
 }
 
-void draw_pixel(t_vars *vars, int x, int y, int color)
+void    free_info_cub(t_info_cub *info_cube)
 {
-	if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT)
-		return;
-	char *dst = vars->data + (y * vars->line_len + x * (vars->bpp / 8));
-	*(unsigned int *)dst = color;
+    free_matrex(info_cube->parts_file.part_paths);
+    free_matrex(info_cube->parts_file.part_colors);
+    if (!info_cube->map)
+        free_matrex(info_cube->parts_file.part_map);
+    free_matrex(info_cube->map);
+    free(info_cube->wall_east);
+    free(info_cube->wall_north);
+    free(info_cube->wall_south);
+    free(info_cube->wall_west);
 }
 
-void draw_background(t_vars *vars)
+char    parsing_info(int argc, char **argv, t_info_cub *info_cube)
 {
-	for (int y = 0; y < HEIGHT; y++)
-	{
-		int color = (y < HEIGHT / 2) ? SKY_COLOR : FLOOR_COLOR;
-		for (int x = 0; x < WIDTH; x++)
-		{
-			draw_pixel(vars, x, y, color);
-		}
-	}
+    char    **file;
+
+    if (check_input(argc, argv))
+        return (1);
+    file = stored_map(argv[1]);
+    if(storted_parts(file, &info_cube->parts_file))
+        return (1);
+    if (parse_paths(info_cube))
+        return (free_info_cub(info_cube), ft_putendl_fd("Error\nInvalid path!!", 2), 1);
+    if (parse_colors(info_cube))
+        return (free_info_cub(info_cube), ft_putendl_fd("Error\nInvalid color!!", 2),  1);
+    if (parse_map(info_cube->parts_file.part_map, info_cube))
+        return (free_info_cub(info_cube), ft_putendl_fd("Error\nInvalid map!!", 2),  1);
+    return (0);
 }
 
-int	main(void)
+int main(int argc, char **argv)
 {
-	t_vars vars;
-
-	vars.mlx = mlx_init();
-	vars.win = mlx_new_window(vars.mlx, WIDTH, HEIGHT, "Hello world!");
-	mlx_hook(vars.win, 2, 1L<<0, close, NULL);
-	vars.img = mlx_new_image(vars.mlx, WIDTH, HEIGHT);
-	vars.data = mlx_get_data_addr(vars.img, &vars.bpp, &vars.line_len, &vars.endian);
-
-	draw_background(&vars);
-
-	mlx_put_image_to_window(vars.mlx, vars.win, vars.img, 0, 0);
-	mlx_loop(vars.mlx);
+    t_info_cub info_cub;
+    
+    // atexit(f);
+    ft_memset(&info_cub, 0, sizeof(info_cub));
+    if (parsing_info(argc, argv, &info_cub))
+        return (1);
+    ft_putendl_fd(info_cub.wall_east, 1);
+    ft_putendl_fd(info_cub.wall_west, 1);
+    ft_putendl_fd(info_cub.wall_south, 1);
+    ft_putendl_fd(info_cub.wall_north, 1);
+    printf("C red %d \n", info_cub.ceiling.red);
+    printf("C green %d \n", info_cub.ceiling.green);
+    printf("C blue %d \n", info_cub.ceiling.blue);
+   printf("F red %d \n", info_cub.floor.red);
+    printf("F green %d \n", info_cub.floor.green);
+    printf("F blue %d \n", info_cub.floor.blue);
+    printf("Pos x player %f \n", info_cub.x);
+    printf("Pos y player %f \n", info_cub.y);
+    print_matrix(info_cub.map);
+    free_info_cub(&info_cub);
+    return (0);
 }
