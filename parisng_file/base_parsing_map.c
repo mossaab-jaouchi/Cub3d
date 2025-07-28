@@ -6,7 +6,7 @@
 /*   By: achamdao <achamdao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 12:14:54 by achamdao          #+#    #+#             */
-/*   Updated: 2025/07/22 13:06:07 by achamdao         ###   ########.fr       */
+/*   Updated: 2025/07/28 15:34:53 by achamdao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,29 +55,19 @@ char    check_with_hiegth_map(char *line, int index, int length_map)
     return (0);
 }
 
-char    check_empty_space_map_up(char *line, char **map, int index)
+char    check_empty_space_map_up(char *line, char **map, int index, size_t i)
 {
-    size_t i;
-
-    i = 0;
-    while (line[i])
+    if (index - 1 >= 0)
     {
-        if (line[i] == '0' || is_player_char(line[i]))
-        {
-            if (index - 1 >= 0)
-            {
-                if (i > ft_strlen(map[index - 1]) - 1)
-                    return (1);
-                else
-                    if (is_whitespace(map[index - 1][i]))
-                        return (1);
-            }
-            if (i - 1 >= 0)
-                if (is_whitespace(line[i - 1]))
-                    return (1);
-        }
-        i++;
+        if (i > ft_strlen(map[index - 1]) - 1)
+            return (1);
+        else
+            if (is_whitespace(map[index - 1][i]))
+                return (1);
     }
+    if ((i - 1) >= 0)
+        if (is_whitespace(line[i - 1]))
+            return (1);
     return (0);
 }
 
@@ -101,10 +91,12 @@ char    check_empty_space_map(char *line, char **map, int index, int length_map)
             if (i + 1 <= (ft_strlen(line) - 1))
                 if (is_whitespace(line[i + 1]))
                     return (1);
+            if (check_empty_space_map_up(line, map, index, i))
+                return (1);
         }
         i++;
     }
-    return (check_empty_space_map_up(line, map, index));
+    return (0);
 }
 
 char    base_parsing_map(char *line, char **map, int index, int length_map)
