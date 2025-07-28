@@ -6,7 +6,7 @@
 /*   By: achamdao <achamdao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 12:14:54 by achamdao          #+#    #+#             */
-/*   Updated: 2025/07/28 15:34:53 by achamdao         ###   ########.fr       */
+/*   Updated: 2025/07/28 15:41:08 by achamdao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ char    check_empty_space_map_up(char *line, char **map, int index, size_t i)
             if (is_whitespace(map[index - 1][i]))
                 return (1);
     }
-    if ((i - 1) >= 0)
+    if (i > 0)
         if (is_whitespace(line[i - 1]))
             return (1);
     return (0);
