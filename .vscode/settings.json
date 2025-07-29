@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "mlx.h": "c",
+        "__locale": "c",
+        "__string": "c",
+        "string": "c",
+        "string_view": "c",
+        "iterator": "c",
+        "ios": "c",
+        "libft.h": "c"
+    }
+}

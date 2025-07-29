@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Debug with LLDB",
+        "type": "lldb",
+        "request": "launch",
+        "program": "${workspaceFolder}/cube",  // أو المسار الكامل لملف التنفيذ
+        "args": [],                              // مرّر المعاملات هنا إن وجدت
+        "cwd": "${workspaceFolder}",
+        "stopOnEntry": false,                    // true إن كنت تريد الوقوف عند أول سطر
+        "environment": [],
+        "externalConsole": false
+      }
+    ]
+  }
+  

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   base_parsing_map.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: achamdao <achamdao@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mjaouchi <mjaouchi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 12:14:54 by achamdao          #+#    #+#             */
-/*   Updated: 2025/07/28 15:41:08 by achamdao         ###   ########.fr       */
+/*   Updated: 2025/07/29 10:00:50 by mjaouchi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void get_start_end(int *end, int *start, char *line)
         start_pos++;
     if (!end_pos || end_pos == start_pos)
     {
-         *end = end_pos;
+        *end = end_pos;
         *start = start_pos;
         return ;
     }
