@@ -6,7 +6,7 @@
 /*   By: mjaouchi <mjaouchi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 18:01:06 by achamdao          #+#    #+#             */
-/*   Updated: 2025/07/29 11:06:59 by mjaouchi         ###   ########.fr       */
+/*   Updated: 2025/07/30 14:46:31 by mjaouchi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,17 @@
 # include <mlx.h>
 
 #define TILE_SIZE 60
-#define WIDTH 1200
+#define WIDTH 1080
 #define HEIGHT 800
+#define DEG_TO_RAD(angle) ((angle) * M_PI / 180.0)
+
+typedef struct s_img {
+	void	*img;
+	char	*addr;
+	int		bpp;
+	int		line_length;
+	int		endian;
+}	t_img;
 
 typedef struct s_vars {
 	void	*mlx;
@@ -42,6 +51,7 @@ typedef struct s_player {
 typedef struct s_game {
 	t_vars		vars;
 	t_player	player;
+	t_img		img;
 }	t_game;
 
 typedef struct s_part_file
@@ -51,11 +61,13 @@ typedef struct s_part_file
 	char	**part_map;    
 }	t_part_file;
 
+
+
 typedef struct s_color
 {
 	int	red;
 	int	green;
-	int	blue;    
+	int	blue;
 }	t_color;
 
 typedef struct s_info_cub
