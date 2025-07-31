@@ -6,7 +6,7 @@
 /*   By: mjaouchi <mjaouchi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 18:01:06 by achamdao          #+#    #+#             */
-/*   Updated: 2025/07/30 14:46:31 by mjaouchi         ###   ########.fr       */
+/*   Updated: 2025/07/31 21:30:15 by mjaouchi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,21 @@
 #define HEIGHT 800
 #define DEG_TO_RAD(angle) ((angle) * M_PI / 180.0)
 
+typedef struct s_tool_move {
+    double move_x;
+    double move_y;
+    double angle;
+    char signal;
+
+    int key_w;
+    int key_a;
+    int key_s;
+    int key_d;
+    int key_left;
+    int key_right;
+} t_tool_move;
+
+
 typedef struct s_img {
 	void	*img;
 	char	*addr;
@@ -30,6 +45,13 @@ typedef struct s_img {
 	int		line_length;
 	int		endian;
 }	t_img;
+
+typedef struct s_color
+{
+	int	red;
+	int	green;
+	int	blue;
+}	t_color;
 
 typedef struct s_vars {
 	void	*mlx;
@@ -52,6 +74,9 @@ typedef struct s_game {
 	t_vars		vars;
 	t_player	player;
 	t_img		img;
+	t_color		ceiling_color;
+	t_color		floor_color;
+	t_tool_move	tool_move;
 }	t_game;
 
 typedef struct s_part_file
@@ -61,14 +86,6 @@ typedef struct s_part_file
 	char	**part_map;    
 }	t_part_file;
 
-
-
-typedef struct s_color
-{
-	int	red;
-	int	green;
-	int	blue;
-}	t_color;
 
 typedef struct s_info_cub
 {
