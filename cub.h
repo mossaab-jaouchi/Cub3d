@@ -6,7 +6,7 @@
 /*   By: mjaouchi <mjaouchi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 18:01:06 by achamdao          #+#    #+#             */
-/*   Updated: 2025/07/31 21:30:15 by mjaouchi         ###   ########.fr       */
+/*   Updated: 2025/08/03 10:07:40 by mjaouchi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ typedef struct s_img {
 	char	*addr;
 	int		bpp;
 	int		line_length;
+	int		width;
+	int		height;
 	int		endian;
 }	t_img;
 
@@ -77,6 +79,7 @@ typedef struct s_game {
 	t_color		ceiling_color;
 	t_color		floor_color;
 	t_tool_move	tool_move;
+	t_img		wall_texture;
 }	t_game;
 
 typedef struct s_part_file

@@ -29,21 +29,43 @@ char *map[] = {
 	"10000000000000000001",
 	"10110000000000000001",
 	"10100000000000000001",
-	"10101101001111111001",
-	"10100001000000000001",
-	"10111111101111111101",
-	"10000000100000000001",
-	"10111110111111111001",
+	"10101100001111111001",
+	"10100000000000000001",
+	"10111110001111111101",
+	"10000000000000000001",
+	"10111110001111111001",
 	"10100010000000001001",
-	"10101010111111101001",
+	"10101010001111101001",
 	"10001000000000001001",
-	"10N11111111111111111",
+	"10N11110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
+	"11111110001111111111",
 	"11111111111111111111",
 	NULL
 };
 
 
-// -------- STRUCTS --------
 
 typedef struct s_ray {
 	double x, y;
@@ -55,7 +77,6 @@ int rgb_to_int(int r, int g, int b)
 	return (r << 16) | (g << 8) | b;
 }
 
-// -------- UTILS --------
 void put_pixel_to_image(t_img *img, int x, int y, int color)
 {
 	if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT)
@@ -69,7 +90,6 @@ void clear_image(t_img *img)
 	memset(img->addr, 0, WIDTH * HEIGHT * (img->bpp / 8));
 }
 
-// -------- DRAWING --------
 
 void    draw_ceiling(t_img *img, int color)
 {
@@ -108,13 +128,16 @@ void    draw_floor(t_img *img, int color)
 	}
 }
 
-void draw_vertical_line(t_img *img, int x, int start_y, int end_y, int color)
+void draw_vertical_line(t_img *img, int x, int start_y, int end_y, t_img *color)
 {
 	if (start_y < 0) start_y = 0;
 	if (end_y >= HEIGHT) end_y = HEIGHT - 1;
-
+	color->bpp = 32; // Assuming 32 bits per pixel
 	for (int y = start_y; y <= end_y; y++)
-		put_pixel_to_image(img, x, y, color);
+	{
+		// unsigned int pixel = *(unsigned int *)(color->addr + (y * color->line_length + x * (color->bpp / 8)));
+		put_pixel_to_image(img, x, y, 0x791d1d);
+	}
 }
 
 void draw_square(t_game *game, int x, int y, int size, int color)
@@ -139,7 +162,6 @@ void draw_mini_map(t_game *game)
 					  (int)(game->player.y / TILE_SIZE) * scale, scale, 0x00FF00);
 }
 
-// -------- RAYCASTING --------
 void execute_ray(t_game *game, double angle, t_ray *ray)
 {
 	double ray_x = cos(angle);
@@ -193,22 +215,24 @@ void draw_ray_column(t_game *game, double ray_length, int col, double angle_diff
 
 	int start_y = (HEIGHT / 2) - (wall_h / 2);
 	int end_y = (HEIGHT / 2) + (wall_h / 2);
-	draw_vertical_line(&game->img, col, start_y, end_y, 0x783f04);
+	draw_vertical_line(&game->img, col, start_y, end_y, &game->wall_texture);
 }
 
 void cast_all_rays(t_game *game)
 {
-	double angle_step = (FOV * M_PI / 180.0) / WIDTH;
-	double start_angle = game->player.angle - (FOV * 0.5 * M_PI / 180.0);
+	double	angle_step = (FOV * M_PI / 180.0) / WIDTH;
+	double	start_angle = game->player.angle - (FOV * 0.5 * M_PI / 180.0);
+	int		col = 0;
+	t_ray	ray;
 
 	draw_ceiling(&game->img, rgb_to_int(game->ceiling_color.red, game->ceiling_color.green, game->ceiling_color.blue));
 	draw_floor(&game->img, rgb_to_int(game->floor_color.red, game->floor_color.green, game->floor_color.blue));
-	for (int col = 0; col < WIDTH; col++)
+	while (col < WIDTH)
 	{
 		double ray_angle = start_angle + col * angle_step;
-		t_ray ray;
 		execute_ray(game, ray_angle, &ray);
 		draw_ray_column(game, ray.length, col, ray_angle - game->player.angle);
+		col++;
 	}
 	draw_mini_map(game);
 	mlx_put_image_to_window(game->vars.mlx, game->vars.win, game->img.img, 0, 0);
@@ -216,10 +240,6 @@ void cast_all_rays(t_game *game)
 
 static char	is_out_of_bounds(t_game *game, int x, int y)
 {
-	if (y < 0 || y >= 20)
-		return (1);
-	if (x < 0 || x >= 21)
-		return (1);
 	if (game->vars.map[y][x] == '1')
 		return (1);
 	return (0);
@@ -287,7 +307,6 @@ int handle_keyrelease(int key, t_tool_move *t)
 }
 
 
-// -------- INPUT --------
 int handle_keypress(t_game *game)
 {
 	t_tool_move *t = &game->tool_move;
@@ -307,7 +326,7 @@ int handle_keypress(t_game *game)
 		{
 			t->move_x = cos(t->angle + M_PI_2) * SPEED;
 			t->move_y = sin(t->angle + M_PI_2) * SPEED;
-			t->signal = '+';
+			t->signal = (t->key_a) ? '-' : '+';
 			checke_collision(game, t->move_x, t->move_y, t->signal);
 		}
 	}
@@ -361,15 +380,107 @@ int handle_keypress(t_game *game)
 // 	return 1;
 // }
 
+#include <mlx.h>
+#include <math.h>
 
-// -------- MAIN --------
+void	draw_circle_from_xpm(void *mlx, void *win, char *xpm_path)
+{
+	int		w, h;
+	void	*img;
+	char	*addr;
+	int		bpp, line_len, endian;
+	int		x, y;
+	int		cx, cy, radius;
+
+	img = mlx_xpm_file_to_image(mlx, xpm_path, &w, &h);
+	addr = mlx_get_data_addr(img, &bpp, &line_len, &endian);
+
+	cx = w / 2;
+	cy = h / 2;
+	radius = (w < h ? w : h) / 2;
+
+	for (y = 0; y < h; y++)
+	{
+		for (x = 0; x < w; x++)
+		{
+			int dx = x - cx;
+			int dy = y - cy;
+			if (dx * dx + dy * dy <= radius * radius)
+			{
+				int pixel = *(int *)(addr + y * line_len + x * (bpp / 8));
+				mlx_pixel_put(mlx, win, x, y, pixel);
+			}
+		}
+	}
+}
+
+
+void	draw_tilted_wall_xpm(t_game *game, void *xpm_img, int img_w, int img_h, int start_x, int start_y, double angle)
+{
+	int		x, y;
+	char	*src_addr;
+	char	*dst_addr;
+	int		src_bpp, src_line_len, src_endian;
+	int		dst_bpp, dst_line_len, dst_endian;
+	int		new_x, new_y;
+
+	src_addr = mlx_get_data_addr(xpm_img, &src_bpp, &src_line_len, &src_endian);
+	dst_addr = mlx_get_data_addr(game->img.img, &dst_bpp, &dst_line_len, &dst_endian);
+
+	for (y = 0; y < img_h; y++)
+	{
+		for (x = 0; x < img_w; x++)
+		{
+			long int color = (int long)(src_addr + y * src_line_len + x * (src_bpp / 8));
+			if (color == 0xFF000000)
+				continue;
+			
+			new_x = (int)(start_x + x + tan(angle) * y);
+			new_y = start_y + y;
+
+			if (new_x >= 0 && new_y >= 0 && new_x < WIDTH && new_y < HEIGHT)
+				*(unsigned int *)(dst_addr + new_y * dst_line_len + new_x * (dst_bpp / 8)) = color;
+		}
+	}
+}
+
+void copy_partial_image(t_img *src, t_img *dest, int start_x, int width)
+{
+	for (int y = 0; y < src->height && y < dest->height; y++)
+	{
+		for (int x = 0; x < width && (start_x + x) < src->width && x < dest->width; x++)
+		{
+			char *src_px = src->addr + (y * src->line_length + (start_x + x) * (src->bpp / 8));
+			char *dst_px = dest->addr + (y * dest->line_length + x * (dest->bpp / 8));
+			*(unsigned int *)dst_px = *(unsigned int *)src_px;
+		}
+	}
+}
+
+int key(int key, t_game *game)
+{
+	game = NULL;
+	if (key == KEY_ESC)
+		exit(0);
+	return 0;
+}
+
 int main(void)
 {
 	t_game		game;
+	t_img		img;
+
 
 	memset(&game, 0, sizeof(t_game));
+	memset(&img, 0, sizeof(t_img));
 	game.vars.mlx = mlx_init();
 	game.vars.win = mlx_new_window(game.vars.mlx, WIDTH, HEIGHT, "Raycasting Engine");
+
+	game.img.img = mlx_new_image(game.vars.mlx, WIDTH, HEIGHT);
+	game.img.addr = mlx_get_data_addr(game.img.img, &game.img.bpp, &game.img.line_length, &game.img.endian);
+
+	game.wall_texture.img = mlx_xpm_file_to_image(game.vars.mlx, "img/texture1.xpm", &game.wall_texture.width, &game.wall_texture.height);
+	game.wall_texture.addr = mlx_get_data_addr(game.wall_texture.img, &game.wall_texture.bpp, &game.wall_texture.line_length, &game.wall_texture.endian);
 
 	game.ceiling_color.red = 200;
 	game.ceiling_color.green = 220;
@@ -387,16 +498,15 @@ int main(void)
 	game.tool_move.signal = 0;
 	game.tool_move.angle = game.player.angle;
 
-	game.img.img = mlx_new_image(game.vars.mlx, WIDTH, HEIGHT);
-	game.img.addr = mlx_get_data_addr(game.img.img, &game.img.bpp, &game.img.line_length, &game.img.endian);
-
+	img.width = 300;
+	img.height = 60;
+	// draw_tilted_wall_xpm(&game, "img/1.xpm", 64, 64, 100, 100, angle);
 	cast_all_rays(&game);
 	// mlx_hook(game.vars.win, 2, 0, handle_keypresse, &game.tool_move);
 	// mlx_loop_hook(game.vars.mlx, handle_keypress, &game);
 	mlx_hook(game.vars.win, 2, 0, handle_keypresse, &game.tool_move);
 	mlx_hook(game.vars.win, 3, 0, handle_keyrelease, &game.tool_move);
 	mlx_loop_hook(game.vars.mlx, handle_keypress, &game);
-
 	mlx_loop(game.vars.mlx);
 	return 0;
 }
